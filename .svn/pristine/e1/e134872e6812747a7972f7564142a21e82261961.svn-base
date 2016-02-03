@@ -1,0 +1,34 @@
+package cn.itcast.service;
+
+import java.util.List;
+
+import cn.itcast.domain.Family;
+import cn.itcast.exception.UsernameExistException;
+
+public interface FamilyService {
+
+	/**
+	 * 保存家人信息到数据库中
+	 * 
+	 * @param family
+	 * @throws UsernameExistException 
+	 */
+	void addFamily(Family family) throws UsernameExistException;
+
+	/**
+	 * 查询家人的信息
+	 * 
+	 * @param username
+	 * @param nick
+	 * @return
+	 */
+	List<Family> FamilyInfo(String username, String nick);
+
+	/**
+	 * 更改家人信息
+	 * 
+	 * @param family
+	 * @return
+	 */
+	void ModifyFamily(Family family, String nicked);
+}

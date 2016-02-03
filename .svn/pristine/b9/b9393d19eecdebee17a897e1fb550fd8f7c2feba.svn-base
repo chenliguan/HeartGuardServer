@@ -1,0 +1,101 @@
+package cn.itcast.web.controllers;
+
+import java.io.IOException;
+import java.util.List;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import cn.itcast.domain.User;
+import cn.itcast.service.UserService;
+import cn.itcast.service.impl.UserServiceImpl;
+
+@SuppressWarnings("serial")
+public class UserServlet extends HttpServlet {
+	private UserService userService = new UserServiceImpl();
+	private String encoding = "UTF-8";
+	private String username;
+	private String operation;
+
+	public void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		request.setCharacterEncoding(encoding);
+		response.setContentType("text/html;charset=" + encoding);
+		operation = request.getParameter("operation");
+		username = request.getParameter("username");
+		if ("userinfo".equals(operation)) {
+			TransmitUserInfo(request, response);
+		} else if("modifyuser".equals(operation)) {
+			ReceiveModifyUser(request, response);
+		}
+	}
+
+	/**
+	 * 查询用户的部分信息
+	 * 
+	 * @param request
+	 * @param response
+	 */
+	private void TransmitUserInfo(HttpServletRequest request,
+			HttpServletResponse response) {
+
+		List<User> list = userService.UserInfo(username);
+		request.setAttribute("json", jsonUserInfo(list)); // 将返回的数据添加到Attribute中，传值到request
+		try {
+			// 转向才能在客户端访问
+			request.getRequestDispatcher("/WEB-INF/page/jsonvideonews.jsp")
+					.forward(request, response);
+		} catch (ServletException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * 接收客户端传送的个人信息修改数据
+	 * 
+	 * @param request
+	 * @param response
+	 * @throws ServletException
+	 * @throws IOException
+	 */
+	private void ReceiveModifyUser(HttpServletRequest request,
+			HttpServletResponse response) throws ServletException, IOException {
+		User user = new User();
+		user.setUsername(request.getParameter("username"));
+		user.setNick(request.getParameter("nick"));
+		user.setBirthday(request.getParameter("birthday"));
+		user.setGender(request.getParameter("gender"));
+		user.setHigh(request.getParameter("high"));
+		user.setWeight(request.getParameter("weight"));
+		
+		userService.ModifyUser(user); // 调用service层
+	}
+	
+
+	private Object jsonUserInfo(List<User> list) {
+		StringBuilder builder = new StringBuilder();
+		builder.append('[');
+		for (User user : list) {
+		builder.append('{');
+		builder.append("username:\"").append(user.getUsername()).append("\",");
+		builder.append("nick:\"").append(user.getNick()).append("\",");
+		builder.append("code:\"").append(user.getCode()).append("\"");
+		builder.append("},");
+		}
+		builder.deleteCharAt(builder.length() - 1);
+		builder.append(']');
+		System.out.println(builder.toString());
+		return builder.toString();
+	}
+
+	public void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+
+		doGet(request, response);
+	}
+
+}

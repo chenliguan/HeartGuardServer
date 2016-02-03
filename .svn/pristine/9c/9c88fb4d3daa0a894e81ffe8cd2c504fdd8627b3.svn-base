@@ -1,0 +1,170 @@
+package cn.itcast.web.controllers;
+
+import java.io.IOException;
+import java.util.Date;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.ConvertUtils;
+import org.apache.commons.beanutils.locale.converters.DateLocaleConverter;
+
+import cn.itcast.domain.User;
+import cn.itcast.exception.UsernameExistException;
+import cn.itcast.service.UserService;
+import cn.itcast.service.impl.UserServiceImpl;
+import cn.itcast.util.WebFormBeanUtils;
+import cn.itcast.web.formbean.LoginFormBean;
+import cn.itcast.web.formbean.RegistFormBean;
+
+@SuppressWarnings("serial")
+public class CenterController extends HttpServlet {
+	private UserService userService = new UserServiceImpl();
+	private String encoding = "UTF-8";
+
+	public void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		request.setCharacterEncoding(encoding);
+		response.setContentType("text/html;charset=" + encoding);
+		
+		String operation = request.getParameter("operation");
+		if ("regist".equals(operation)) {
+			regist(request, response);
+		} else if ("login".equals(operation)) {
+			login(request, response);
+		} else if ("logout".equals(operation)) {
+			logout(request, response);
+		}
+	}
+
+	/**
+	 * 注销用户
+	 * 
+	 * @param request
+	 * @param response
+	 * @throws ServletException
+	 * @throws IOException
+	 */
+	private void logout(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		String result = "";
+		request.getSession().removeAttribute("user"); // ??????????????
+		result = "注销成功！请重新登录";
+
+		if ("json".equals(request.getParameter("format"))) {
+			request.setAttribute("json", jsonOne(result)); // 将返回的数据添加到Attribute中，传值到request
+			request.getRequestDispatcher("/WEB-INF/page/jsonvideonews.jsp")
+					.forward(request, response); // 转向才能在客户端访问
+		}
+	}
+
+	/**
+	 * 用户登录
+	 * 
+	 * @param request
+	 * @param response
+	 * @throws ServletException
+	 * @throws IOException
+	 */
+	private void login(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+
+		// 封装数据到loginBean中
+		String result = null;
+		LoginFormBean loginBean = WebFormBeanUtils.fillFormBean(request,
+				LoginFormBean.class);
+		loginBean.setUsername(request.getParameter("username"));
+		loginBean.setPassword(request.getParameter("password"));
+		User user = userService.login(loginBean.getUsername(),
+				loginBean.getPassword());
+		if (user == null) {
+			// 错误的用户名或密码
+			result = "错误的用户名或密码";
+			System.out.println("错误的用户名或密码");
+		} else {
+			// 登录成功
+			request.getSession().setAttribute("user", user); // ?????????
+			result = "登录成功！";
+			System.out.println("登录成功");
+		}
+
+		if ("json".equals(request.getParameter("format"))) {
+			request.setAttribute("json", jsonOne(result)); // 将返回的数据添加到Attribute中，传值到request
+			request.getRequestDispatcher("/WEB-INF/page/jsonvideonews.jsp")
+					.forward(request, response); // 转向才能在客户端访问
+		}
+	}
+
+	/**
+	 * 用户注册
+	 * 
+	 * @param request
+	 * @param response
+	 * @throws ServletException
+	 * @throws IOException
+	 */
+	private void regist(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+
+		String result = null;
+		RegistFormBean registBean = null;
+
+		try {
+			// 封装用户输入的数据到loginBean中
+			registBean = WebFormBeanUtils.fillFormBean(request,
+					RegistFormBean.class); // ?????????
+			registBean.setUsername(request.getParameter("username")); // 怎样处理不用set
+			registBean.setNick(request.getParameter("nick"));
+			registBean.setPassword(request.getParameter("password"));
+			registBean.setCode(request.getParameter("code"));
+			User user = new User();
+			// 把FormBean中的数据转移到User中：填充模型
+			ConvertUtils.register(new DateLocaleConverter(), Date.class);
+			// 遍历formBean中的所有的属性。找User中的同名称的属性。user.setUsername(formBean.getUsername())
+			BeanUtils.copyProperties(user, registBean);
+			userService.regist(user);
+			result = "注册成功";
+			System.out.println(result);
+		} catch (UsernameExistException e) {
+			// 用户名重复
+			result = "用户名已被占用，请换一个";
+			System.out.println(result);
+		} catch (Exception e) {
+			result = "对不起！服务器忙";
+			System.out.println(result);
+		}
+
+		if ("json".equals(request.getParameter("format"))) {
+			request.setAttribute("json", jsonOne(result));
+			request.getRequestDispatcher("/WEB-INF/page/jsonvideonews.jsp")
+					.forward(request, response);
+		}
+	}
+
+	/*
+	 * 封装json数据
+	 */
+	public String jsonOne(String result) {
+		// [{id:56,title:"xxxxx",timelength:90},{id:16,title:"xbbx",timelength:20}]
+		StringBuilder builder = new StringBuilder();
+		builder.append('[');
+		builder.append('{');
+		builder.append("id:").append(100).append(',');
+		builder.append("title:\"").append(result).append("\",");
+		builder.append("timelength:").append(10);
+		builder.append("},");
+		builder.deleteCharAt(builder.length() - 1);
+		builder.append(']');
+		return builder.toString();
+	}
+
+	public void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+
+		doGet(request, response);
+	}
+
+}

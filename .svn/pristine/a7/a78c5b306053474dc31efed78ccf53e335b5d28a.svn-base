@@ -1,0 +1,197 @@
+package cn.itcast.web.controllers;
+
+import java.io.IOException;
+import java.util.List;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import cn.itcast.domain.Result;
+import cn.itcast.exception.UsernameExistException;
+import cn.itcast.service.ResultService;
+import cn.itcast.service.impl.ResultServiceImpl;
+
+@SuppressWarnings("serial")
+public class ResultsController extends HttpServlet {
+	private ResultService resultService = new ResultServiceImpl();
+	private String encoding = "UTF-8";
+	private String username;
+	private String operation;
+
+	public void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		request.setCharacterEncoding(encoding);
+		response.setContentType("text/html;charset=" + encoding);
+		operation = request.getParameter("operation");
+		username = request.getParameter("username");
+		if ("send".equals(operation)) {
+			ReceiveResults(request, response);
+		}
+		if ("receive".equals(operation)) {
+			TransmitResults(request, response);
+		} 
+		if ("receiveRate_grade".equals(operation)) {
+			TransmitRate_grade(request, response);
+		}
+	}
+
+	/**
+	 * 接收客户端传送的监测报告数据
+	 * 
+	 * @param request
+	 * @param response
+	 * @throws ServletException
+	 * @throws IOException
+	 */
+	private void ReceiveResults(HttpServletRequest request,
+			HttpServletResponse response) throws ServletException, IOException {
+		Result result = new Result();
+		result.setUsername(request.getParameter("username"));
+		result.setTime(request.getParameter("time"));
+		result.setRate_grade(request.getParameter("rate_grade"));
+		result.setSymptoms_rhythm(request.getParameter("symptoms_rhythm"));
+		result.setRate_average(request.getParameter("rate_average"));
+		result.setRate_min(request.getParameter("rate_min"));
+		result.setRate_max(request.getParameter("rate_max"));
+		result.setRhythm_heart(request.getParameter("rhythm_heart"));
+		result.setSinus_arrest(request.getParameter("sinus_arrest"));
+		result.setCardia_heart(request.getParameter("cardia_heart"));
+		result.setHeart_beat_number(request.getParameter("heart_beat_number"));
+		result.setPsvc_number(request.getParameter("psvc_number"));
+		result.setPvc_number(request.getParameter("pvc_number"));
+		result.setQRS(request.getParameter("QRS"));
+		result.setRR(request.getParameter("RR"));
+		result.setQT(request.getParameter("QT"));
+		result.setPR(request.getParameter("PR"));
+		result.setQTC(request.getParameter("QTC"));
+		result.setSymptoms_heart(request.getParameter("symptoms_heart"));
+		result.setSymptoms_heart_left(request
+				.getParameter("symptoms_heart_left"));
+		result.setSymptoms_heart_right(request
+				.getParameter("symptoms_heart_right"));
+		result.setSymptoms_heart_two(request.getParameter("symptoms_heart_two"));
+		try {
+			resultService.Receive(result);
+		} catch (UsernameExistException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 传送所有监测报告数据到客户端
+	 * 
+	 * @param request
+	 * @param response
+	 * @throws IOException
+	 * @throws ServletException
+	 */
+	private void TransmitResults(HttpServletRequest request,
+			HttpServletResponse response) throws ServletException, IOException {
+		
+		List<Result> list = resultService.TransmitResults(username);
+		request.setAttribute("jsonResults", jsonResults(list)); // 将返回的数据添加到Attribute中，传值到request
+		request.getRequestDispatcher("/WEB-INF/page/jsonResults.jsp")
+				.forward(request, response);// 转向才能在客户端访问
+	}
+
+	/**
+	 * 传送所有Rate_grade数据到客户端
+	 * 
+	 * @param request
+	 * @param response
+	 * @throws IOException
+	 * @throws ServletException
+	 */
+	private void TransmitRate_grade(HttpServletRequest request,
+			HttpServletResponse response) throws ServletException, IOException {
+		
+		List<Result> list = resultService.Transmit_Rate_grade(username);
+		request.setAttribute("jsonRate_grade", jsonRate_grade(list)); // 将返回的数据添加到Attribute中，传值到request
+		request.getRequestDispatcher("/WEB-INF/page/jsonRate_grade.jsp")
+				.forward(request, response);// 转向才能在客户端访问
+	}
+
+	/*
+	 * 封装所有监测报告数据jsonResults
+	 */
+	public String jsonResults(List<Result> list) {
+
+		StringBuilder builder = new StringBuilder();
+		builder.append('[');
+		for (Result result : list) {
+			builder.append('{');
+			builder.append("username:\"").append(result.getUsername())
+					.append("\",");
+			builder.append("time:\"").append(result.getTime()).append("\",");
+			builder.append("rate_grade:\"").append(result.getRate_grade())
+					.append("\",");
+			builder.append("symptoms_rhythm:\"")
+					.append(result.getSymptoms_rhythm()).append("\",");
+			builder.append("rate_average:\"").append(result.getRate_average())
+					.append("\",");
+			builder.append("rate_min:\"").append(result.getRate_min())
+					.append("\",");
+			builder.append("rate_max:\"").append(result.getRate_max())
+					.append("\",");
+			builder.append("rhythm_heart:\"").append(result.getRhythm_heart())
+					.append("\",");
+			builder.append("sinus_arrest:\"").append(result.getSinus_arrest())
+					.append("\",");
+			builder.append("cardia_heart:\"").append(result.getCardia_heart())
+					.append("\",");
+			builder.append("heart_beat_number:\"")
+					.append(result.getHeart_beat_number()).append("\",");
+			builder.append("psvc_number:\"").append(result.getPsvc_number())
+					.append("\",");
+			builder.append("pvc_number:\"").append(result.getPvc_number())
+					.append("\",");
+			builder.append("QRS:\"").append(result.getQRS()).append("\",");
+			builder.append("RR:\"").append(result.getRR()).append("\",");
+			builder.append("QT:\"").append(result.getQT()).append("\",");
+			builder.append("PR:\"").append(result.getPR()).append("\",");
+			builder.append("QTC:\"").append(result.getQTC()).append("\",");
+			builder.append("symptoms_heart:\"")
+					.append(result.getSymptoms_heart()).append("\",");
+			builder.append("symptoms_heart_left:\"")
+					.append(result.getSymptoms_heart_left()).append("\",");
+			builder.append("symptoms_heart_right:\"")
+					.append(result.getSymptoms_heart_right()).append("\",");
+			builder.append("symptoms_heart_two:\"")
+					.append(result.getSymptoms_heart_two()).append("\"");
+			builder.append("},");
+		}
+		builder.deleteCharAt(builder.length() - 1);
+		builder.append(']');
+		System.out.println(builder.toString());
+		return builder.toString();
+	}
+
+	/*
+	 * 封装所有监测报告数据jsonRate_grade
+	 */
+	public String jsonRate_grade(List<Result> list) {
+
+		StringBuilder builder = new StringBuilder();
+		builder.append('[');
+		for (Result result : list) {
+			builder.append('{');
+			builder.append("rate_grade:\"").append(result.getRate_grade())
+					.append("\"");
+			builder.append("},");
+		}
+		builder.deleteCharAt(builder.length() - 1);
+		builder.append(']');
+		System.out.println(builder.toString());
+		return builder.toString();
+	}
+
+	
+	public void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+
+		doGet(request, response);
+	}
+
+}

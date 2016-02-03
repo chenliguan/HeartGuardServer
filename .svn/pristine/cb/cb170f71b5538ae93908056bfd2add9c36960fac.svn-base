@@ -1,0 +1,3 @@
+ResultDao=cn.itcast.dao.impl.ResultDaoMySQLImpl
+UserDao=cn.itcast.dao.impl.UserDaoMySQLImpl
+SmsDao=cn.itcast.dao.impl.SmsDaoMySQLImpl

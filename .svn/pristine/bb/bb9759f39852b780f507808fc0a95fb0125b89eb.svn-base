@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
+  <display-name>webs</display-name>
+  <filter>
+    <display-name>EncodingFilter</display-name>
+    <filter-name>EncodingFilter</filter-name>
+    <filter-class>cn.itcast.filter.EncodingFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>EncodingFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  <servlet>
+    <display-name>This is the display name of my J2EE component</display-name>
+    <servlet-name>CenterController</servlet-name>
+    <servlet-class>cn.itcast.web.controllers.CenterController</servlet-class>
+  </servlet>
+  <servlet>
+    <display-name>This is the display name of my J2EE component</display-name>
+    <servlet-name>WebController</servlet-name>
+    <servlet-class>cn.itcast.web.controller.WebController</servlet-class>
+  </servlet>
+  <servlet>
+    <display-name>This is the display name of my J2EE component</display-name>
+    <servlet-name>ResultsController</servlet-name>
+    <servlet-class>cn.itcast.web.controllers.ResultsController</servlet-class>
+  </servlet>
+  <servlet>
+    <display-name>This is the display name of my J2EE component</display-name>
+    <servlet-name>UploadServlet</servlet-name>
+    <servlet-class>cn.itcast.web.controllers.UploadServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <display-name>This is the display name of my J2EE component</display-name>
+    <servlet-name>DownloadFileServlet</servlet-name>
+    <servlet-class>cn.itcast.web.controllers.DownloadFileServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <description>This is the description of my J2EE component</description>
+    <display-name>This is the display name of my J2EE component</display-name>
+    <servlet-name>SmsServlet</servlet-name>
+    <servlet-class>cn.itcast.web.controllers.SmsServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <description>This is the description of my J2EE component</description>
+    <display-name>This is the display name of my J2EE component</display-name>
+    <servlet-name>UserServlet</servlet-name>
+    <servlet-class>cn.itcast.web.controllers.UserServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <description>This is the description of my J2EE component</description>
+    <display-name>This is the display name of my J2EE component</display-name>
+    <servlet-name>FamilyController</servlet-name>
+    <servlet-class>cn.itcast.web.controllers.FamilyController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>CenterController</servlet-name>
+    <url-pattern>/servlet/CenterController</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>WebController</servlet-name>
+    <url-pattern>/servlet/WebController</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>ResultsController</servlet-name>
+    <url-pattern>/servlet/ResultsController</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>UploadServlet</servlet-name>
+    <url-pattern>/servlet/UploadServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>DownloadFileServlet</servlet-name>
+    <url-pattern>/servlet/DownloadFileServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>SmsServlet</servlet-name>
+    <url-pattern>/servlet/SmsServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>UserServlet</servlet-name>
+    <url-pattern>/servlet/UserServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>FamilyController</servlet-name>
+    <url-pattern>/servlet/FamilyController</url-pattern>
+  </servlet-mapping>
+  <welcome-file-list>
+    <welcome-file>index.jsp</welcome-file>
+  </welcome-file-list>
+</web-app>
